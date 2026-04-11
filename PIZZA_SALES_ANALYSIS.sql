@@ -141,7 +141,64 @@ limit 3;
 
 -----------------------------------------------------------------------------------------------------
 
+select * from pizzas;
 
+--1. checking for the duplicates
+
+select pizza_id, pizza_type_id
+from pizzas
+group by pizza_id, pizza_type_id
+having count(*) > 1;
+
+
+-- 2. getting second highest price from the pizzas table
+
+select max(price) as second_max_price from pizzas
+where price < (select max(price) as second_max_price from pizzas);
+
+
+--3. Total revenue per Size 
+
+select p.size, sum(od.quantity * p.price) as Total_Revenue from pizzas as p
+inner join order_details as od
+on p.pizza_id = od.pizza_id
+group by size
+order by Total_Revenue desc;
+
+
+--4. get the top 3 highest paid pizzas name
+
+select pt.name, sum(p.price) as cost from pizza_types as pt
+inner join pizzas as p
+on pt.pizza_type_id = p.pizza_type_id
+Group by pt.name
+order by cost desc
+limit 3;
+
+-- 5. show the count of orders per customer
+
+select * from order_details;
+
+select order_details_id, count(*) as Order_Count from order_details	
+group by order_details_id;	
+
+--6. getting the latest order placed by each order
+select order_id, max(date) as latest_ordered_date from orders
+group by order_id;
+
+--7. identifying most selling pizza name product
+select order_id, sum(quantity) as total_quantity  from order_details
+group by order_id
+order by total_quantity desc
+limit 1;
+
+--8. count which order placed more than 5 times
+select count(*) from order_details;
+
+select count(*) as order_count from 
+(select order_id from order_details 
+group by order_id
+having count(*) > 5) as sub;
 
 
 
